@@ -1,55 +1,44 @@
 /**
  * Check Internet Connection
- * 
  * Use Case:
- *      Applications that require checking the Internet Connection. 
+ *      Applications that require checking the Internet Connection.
  *      For example, a website that has a queue system for offline
  *      content.
- * 
  * @author Joseph Kasavage
  */
 var checkInternetConnection = {
     /**
      * Notify User of Connectivity Issues
-     * 
      * @param bool
      */
     notify: true,
 
     /**
-     * Counter 
-     * 
+     * Counter
      * For how many times the process has been called
-     * 
      * @param integer
      */
     counter: 0,
 
     /**
      * Counter Limit
-     * 
      * How many times the process should be called prior to alerting
      * the User of inactive internet connection
-     * 
      * @param integer
      */
     limit: 3,
 
     /**
-     * Process Timer 
-     * 
+     * Process Timer
      * Set how many miliseconds to wait prior to repeating the process
-     * 
      * @param integer
      */
     timer : 5000,
 
     /**
      * Website Array
-     * 
      * In the event that Google is not up, which is unlikely, you
      * can add websites to reference
-     * 
      * @param array
      */
     siteList: [
@@ -58,57 +47,53 @@ var checkInternetConnection = {
 
     /**
      * Check Connection
-     * 
      * Go through the steps to verify Internet Connection
      * Keep in mind that if for some reason a firewall has the
      * incoming IP blocked or does not allow the connection it
      * would show the behavior of not having connectivity
-     * 
      * @return void
      */
     checkConnection: function() {
         // Internet Explorer 5/6 does no support XMLHTTPRequest
-        // Added support for ActiveXObject just in case
+        // Added support for ActiveXObject
         var xhr = (window.XMLHTTPRequest) ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
 
         xhr.onreadystatechange = function() {
-            if(this.readyState == 4 && this.status == 200) {
-                if(!checkInternetConnection.notify) {
-                    checkInternetConnection.notify = true;
+            if(xhr.readyState == 4 && xhr.status == 200) {
+                if(!this.notify) {
+                    this.notify = true;
                 }
 
-                checkInternetConnection.connectionGood();
+                this.connectionGood();
             } else {
-                checkInternetConnection.counter++;
+                this.counter++;
 
-                if(checkInternetConnection.counter >= checkInternetConnection.limit) {
-                    checkInternetConnection.notify = false;
+                if(this.counter >= this.limit) {
+                    this.notify = false;
                 }
 
-                checkInternetConnection.connectionBad();
+                this.connectionBad();
             }
         };
 
         var site;
 
-        if(checkInternetConnection.siteList.length > 1)
+        if(this.siteList.length > 1)
         {
-            site = checkInternetConnection.siteList[Math.floor(Math.random()*checkInternetConnection.siteList.length)];
+            site = this.siteList[Math.floor(Math.random()*this.siteList.length)];
         } else {
-            site = checkInternetConnection.siteList[0];
+            site = this.siteList[0];
         }
 
         xhr.open("GET", site, true);
         xhr.send();
 
-        setTimeout(function() { checkInternetConnection.checkConnection(); }, checkInternetConnection.timer);
+        setTimeout(function() { this.checkConnection(); }, this.timer);
     },
 
     /**
      * Good Connection Events
-     * 
      * Process Events for a Good Connection
-     * 
      * @return void
      */
     connectionGood: function() {
@@ -127,9 +112,7 @@ var checkInternetConnection = {
 
     /**
      * Bad Connection Events
-     * 
      * Process Events for a Bad Connection
-     * 
      * @return void
      */
     connectionBad: function() {
@@ -139,7 +122,7 @@ var checkInternetConnection = {
             connectionStatusImage.src = "red.gif";
         }
 
-        if(checkInternetConnection.notify) {
+        if(this.notify) {
             var connectionErrorDiv = document.getElementById("connectionErrorDiv");
 
             connectionErrorDiv.innerHTML = "<b style='color: red;'>There appears to be an issue with your Internet Connection. Please check connectivity.</b>";
